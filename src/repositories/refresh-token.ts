@@ -1,5 +1,5 @@
 import { nanoid } from "nanoid";
-import { addDays } from "date-fns";
+import { addDays, addMinutes } from "date-fns";
 import { type Repository } from "typeorm";
 import { AppDataSource } from "@/configs/db";
 import { RefreshToken } from "@/entities/RefreshToken";
@@ -16,7 +16,26 @@ class RefreshTokenService {
 
         await this.refreshTokenRepository.save(refreshToken);
 
-        return refreshToken.token;
+        return refreshToken;
+    }
+
+    async updateMany(userId: string) {
+        return await this.refreshTokenRepository.update(
+            { userId, revoked: false },
+            { revoked: true, updatedAt: new Date() },
+        );
+    }
+
+    async updateById(id: string, replacedBy: string) {
+        return await this.refreshTokenRepository.update(id, {
+            expiresAt: addMinutes(new Date(), 3),
+            revoked: true,
+            replacedBy,
+        });
+    }
+
+    async getByToken(token: string) {
+        return await this.refreshTokenRepository.findOneBy({ token });
     }
 }
 

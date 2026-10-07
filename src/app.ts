@@ -84,12 +84,6 @@ app.onError((err, c) => {
         return c.json(apiResponse, apiResponse.statusCode as ContentfulStatusCode);
     }
 
-    // if (err instanceof ApiError) {
-    //     const apiResponse = ApiResponse.failure(err.message, null, err.statusCode);
-
-    //     return c.json(apiResponse, apiResponse.statusCode as ContentfulStatusCode);
-    // }
-
     return c.json(
         ApiResponse.failure("Something went wrong", null, StatusCodes.INTERNAL_SERVER_ERROR),
         StatusCodes.INTERNAL_SERVER_ERROR,

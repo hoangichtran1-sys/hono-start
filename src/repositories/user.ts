@@ -12,6 +12,16 @@ class UserService {
         return user;
     }
 
+    async findBySlug(slug: string) {
+        const user = await this.userRepository.findOneBy({ slug });
+        return user;
+    }
+
+    async findById(id: string) {
+        const user = await this.userRepository.findOneBy({ id });
+        return user;
+    }
+
     async findAll() {
         const users = await this.userRepository.find();
         return users;
@@ -31,6 +41,14 @@ class UserService {
         await this.userRepository.save(newUser);
 
         return { newUser, refreshToken };
+    }
+
+    async uploadAvatar(userId: string, avatarUrl: string) {
+        return await this.userRepository.update(userId, { avatarUrl });
+    }
+
+    async delete(id: string) {
+        return await this.userRepository.delete(id);
     }
 }
 

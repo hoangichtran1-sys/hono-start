@@ -20,10 +20,15 @@ export const loginRequest = z.object({
         .regex(/[a-z]/, "Password must contain at least one lowercase letter"),
 });
 
-export const loginResponse = baseResponse.extend({
-    data: z.object({
-        accessToken: z.string(),
-        exp: z.union([z.string(), z.number().int()]),
-    }),
-});
+export const loginResponse = baseResponse
+    .extend({
+        data: z.object({
+            accessToken: z.string(),
+            exp: z.union([z.string(), z.number().int()]),
+        }),
+    })
+    .meta({
+        ref: "AuthResponse",
+    });
 export const registerResponse = loginResponse;
+export const refreshTokenResponse = loginResponse;
