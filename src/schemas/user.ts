@@ -18,6 +18,7 @@ export const userResponse = baseResponse
             avatarUrl: z.string().nullable(),
             isAdmin: z.boolean(),
         }),
+        statusCode: z.number().int().positive().default(200),
     })
     .meta({
         ref: "UserResponse",

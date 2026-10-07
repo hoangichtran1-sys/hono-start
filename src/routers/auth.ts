@@ -46,7 +46,9 @@ const authRouter = new Hono()
                     StatusCodes.BAD_REQUEST,
                 ),
                 ...createApiResponse(
-                    normalErrorResponse,
+                    normalErrorResponse.extend({
+                        statusCode: z.number().int().positive().default(409),
+                    }),
                     "User already exists",
                     StatusCodes.CONFLICT,
                 ),
@@ -108,9 +110,17 @@ const authRouter = new Hono()
                     "Validation failed login body",
                     StatusCodes.BAD_REQUEST,
                 ),
-                ...createApiResponse(normalErrorResponse, "User not found", StatusCodes.NOT_FOUND),
                 ...createApiResponse(
-                    normalErrorResponse,
+                    normalErrorResponse.extend({
+                        statusCode: z.number().int().positive().default(404),
+                    }),
+                    "User not found",
+                    StatusCodes.NOT_FOUND,
+                ),
+                ...createApiResponse(
+                    normalErrorResponse.extend({
+                        statusCode: z.number().int().positive().default(401),
+                    }),
                     "Invalid credentials",
                     StatusCodes.UNAUTHORIZED,
                 ),
@@ -191,17 +201,16 @@ const authRouter = new Hono()
             responses: {
                 ...createApiResponse(refreshTokenResponse, "Refresh token success"),
                 ...createApiResponse(
-                    normalErrorResponse,
-                    "Missing refresh token",
+                    normalErrorResponse.extend({
+                        statusCode: z.number().int().positive().default(401),
+                    }),
+                    "Refresh token not found or has expired or is revoke",
                     StatusCodes.UNAUTHORIZED,
                 ),
                 ...createApiResponse(
-                    normalErrorResponse,
-                    "Refresh token has expired or is revoke",
-                    StatusCodes.UNAUTHORIZED,
-                ),
-                ...createApiResponse(
-                    normalErrorResponse,
+                    normalErrorResponse.extend({
+                        statusCode: z.number().int().positive().default(400),
+                    }),
                     "Refresh token data not found",
                     StatusCodes.BAD_REQUEST,
                 ),

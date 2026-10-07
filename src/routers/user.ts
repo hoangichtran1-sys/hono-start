@@ -13,7 +13,7 @@ import { StatusCodes } from "http-status-codes";
 import { userDTO, userResponse } from "@/schemas/user";
 import { createApiResponse } from "@/utils/open-api-response-builders";
 import { customerValidator } from "@/utils/customer-validator";
-import { normalErrorResponse, validationErrorResponse } from "@/schemas/error";
+import { JWTErrorResponse, normalErrorResponse, validationErrorResponse } from "@/schemas/error";
 
 const userRouter = new Hono()
     .use(jwt(jwtConfig))
@@ -24,7 +24,18 @@ const userRouter = new Hono()
             tags: ["User"],
             responses: {
                 ...createApiResponse(userResponse, "Get current"),
-                ...createApiResponse(normalErrorResponse, "User not found", StatusCodes.NOT_FOUND),
+                ...createApiResponse(
+                    normalErrorResponse.extend({
+                        statusCode: z.number().int().positive().default(404),
+                    }),
+                    "User not found",
+                    StatusCodes.NOT_FOUND,
+                ),
+                ...createApiResponse(
+                    JWTErrorResponse,
+                    "Jwt token expired or invalid",
+                    StatusCodes.UNAUTHORIZED,
+                ),
             },
         }),
         authMiddleware,
@@ -51,7 +62,13 @@ const userRouter = new Hono()
             tags: ["User"],
             responses: {
                 ...createApiResponse(z.array(userResponse), "Get all user"),
-                ...createApiResponse(normalErrorResponse, "Forbidden", StatusCodes.FORBIDDEN),
+                ...createApiResponse(
+                    normalErrorResponse.extend({
+                        statusCode: z.number().int().positive().default(403),
+                    }),
+                    "Forbidden",
+                    StatusCodes.FORBIDDEN,
+                ),
             },
         }),
         authMiddleware,
@@ -80,7 +97,13 @@ const userRouter = new Hono()
             tags: ["User"],
             responses: {
                 ...createApiResponse(userResponse, "Get user by slug"),
-                ...createApiResponse(normalErrorResponse, "User not found", StatusCodes.NOT_FOUND),
+                ...createApiResponse(
+                    normalErrorResponse.extend({
+                        statusCode: z.number().int().positive().default(404),
+                    }),
+                    "User not found",
+                    StatusCodes.NOT_FOUND,
+                ),
                 ...createApiResponse(
                     validationErrorResponse,
                     "Validation failed",
@@ -119,7 +142,9 @@ const userRouter = new Hono()
                     StatusCodes.BAD_REQUEST,
                 ),
                 ...createApiResponse(
-                    normalErrorResponse,
+                    normalErrorResponse.extend({
+                        statusCode: z.number().int().positive().default(400),
+                    }),
                     "Failed to upload file",
                     StatusCodes.BAD_REQUEST,
                 ),
@@ -179,7 +204,13 @@ const userRouter = new Hono()
             tags: ["User"],
             responses: {
                 ...createApiResponse(z.null(), "Delete user", StatusCodes.NO_CONTENT),
-                ...createApiResponse(normalErrorResponse, "Forbidden", StatusCodes.FORBIDDEN),
+                ...createApiResponse(
+                    normalErrorResponse.extend({
+                        statusCode: z.number().int().positive().default(403),
+                    }),
+                    "Forbidden",
+                    StatusCodes.FORBIDDEN,
+                ),
                 ...createApiResponse(
                     validationErrorResponse,
                     "Validation failed",

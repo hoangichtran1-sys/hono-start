@@ -26,9 +26,12 @@ export const loginResponse = baseResponse
             accessToken: z.string(),
             exp: z.union([z.string(), z.number().int()]),
         }),
+        statusCode: z.number().int().positive().default(200),
     })
     .meta({
         ref: "AuthResponse",
     });
-export const registerResponse = loginResponse;
+export const registerResponse = loginResponse.extend({
+    statusCode: z.number().int().positive().default(201),
+});
 export const refreshTokenResponse = loginResponse;
